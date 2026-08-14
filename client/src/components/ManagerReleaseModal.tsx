@@ -154,7 +154,7 @@ export function ManagerReleaseModal() {
                     {isCurrentlyReleased ? 'Reclaim Parking Slot' : 'Release Parking Slot'}
                   </h3>
                   <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', margin: '4px 0 0 0' }}>
-                    {isCurrentlyReleased ? `Reclaim slot ${selectedSlot.label}` : `Release slot ${selectedSlot.label} for others`}
+                    {isCurrentlyReleased ? `Reclaim slot ${selectedSlot.floor_id.replace('floor-', '').toUpperCase()} - ${selectedSlot.label}-${selectedSlot.position}` : `Release slot ${selectedSlot.floor_id.replace('floor-', '').toUpperCase()} - ${selectedSlot.label}-${selectedSlot.position} for others`}
                   </p>
                 </div>
                 <button onClick={() => setShowManagerReleaseModal(false)} style={{ background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: '8px', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF', cursor: 'pointer' }}>

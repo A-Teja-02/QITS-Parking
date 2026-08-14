@@ -136,16 +136,16 @@ export function ParkingSpace({
     cursor: (isManagerOrHR && !isMySlot) ? 'not-allowed' : baseStyle.cursor
   };
   
-  if (state === 'reserved_manager' && designation) {
-    s.background = '#FFFBEB';
-    s.border = '2px solid #FCD34D';
-    s.labelColor = '#92400E';
-    s.labelBg = '#FEF3C7';
-  } else if (state === 'reserved_manager' && manager_role === 'hr') {
+  if (state === 'reserved_manager' && (manager_role === 'hr' || designation === 'HR Director')) {
     s.background = '#F5F3FF';
     s.border = '2px solid #7C3AED';
     s.labelColor = '#6D28D9';
     s.labelBg = '#EDE9FE';
+  } else if (state === 'reserved_manager' && designation) {
+    s.background = '#FFFBEB';
+    s.border = '2px solid #FCD34D';
+    s.labelColor = '#92400E';
+    s.labelBg = '#FEF3C7';
   }
   
   const isReserved = state === 'reserved_employee' || state === 'reserved_manager';
@@ -232,18 +232,19 @@ export function ParkingSpace({
         </motion.div>
       )}
 
+      {/* Serial Number */}
       <div
         style={{
-          fontSize: '13px',
+          position: 'absolute',
+          top: '10px',
+          left: '12px',
+          fontSize: '11px',
           fontWeight: '700',
           color: s.labelColor,
-          background: s.labelBg,
-          padding: '4px 12px',
-          borderRadius: '20px',
-          letterSpacing: '0.05em',
+          opacity: 0.6,
         }}
       >
-        {slot.label}
+        {slot.floor_id.replace('floor-', '').toUpperCase()}
       </div>
 
       <div
@@ -290,6 +291,20 @@ export function ParkingSpace({
         {state === 'unavailable' && (
           <div style={{ fontSize: '14px', fontWeight: '600', color: '#6B7280' }}>Unavailable</div>
         )}
+      </div>
+
+      <div
+        style={{
+          fontSize: '13px',
+          fontWeight: '700',
+          color: s.labelColor,
+          background: s.labelBg,
+          padding: '4px 12px',
+          borderRadius: '20px',
+          letterSpacing: '0.05em',
+        }}
+      >
+        {slot.label}-{slot.position}
       </div>
 
       {(state === 'available' || state === 'released_manager') && isClickable && (

@@ -165,7 +165,7 @@ export function ReservationModal() {
                     {
                       icon: <MapPin size={15} color="#4A6FA5" />,
                       label: 'Parking Slot',
-                      value: selectedSlot?.label ?? '—',
+                      value: selectedSlot ? `${selectedSlot.floor_id.replace('floor-', '').toUpperCase()} - ${selectedSlot.label}-${selectedSlot.position}` : '—',
                       highlight: true,
                     },
                   ].map((item, i) => (

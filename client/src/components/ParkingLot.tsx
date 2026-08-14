@@ -73,6 +73,52 @@ export function ParkingLot() {
           </div>
         </div>
       )}
+      {/* Color Indicators Legend */}
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '20px',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginBottom: '32px',
+          paddingBottom: '20px',
+          borderBottom: '1px solid #F2F4F7',
+        }}
+      >
+        {[
+          { border: '2px solid #2D6A4F', bg: '#FAFFFE', label: 'Available' },
+          { border: '2px solid #1E3A5F', bg: '#EEF4FF', label: 'My Booking' },
+          { border: '2px solid #FCA5A5', bg: '#FFF5F5', label: 'Booked' },
+          { border: '2px solid #FCD34D', bg: '#FFFBEB', label: 'Manager Reserved' },
+          { border: '2px solid #7C3AED', bg: '#F5F3FF', label: 'HR Reserved' },
+          { border: '2px solid #D1D5DB', bg: '#F9FAFB', label: 'Maintenance' },
+        ].map((item) => (
+          <div
+            key={item.label}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '12px',
+              fontWeight: '600',
+              color: '#475569',
+            }}
+          >
+            <div
+              style={{
+                width: '16px',
+                height: '16px',
+                borderRadius: '4px',
+                background: item.bg,
+                border: item.border,
+              }}
+            />
+            <span>{item.label}</span>
+          </div>
+        ))}
+      </div>
+
       <div
         className="parking-grid"
         style={{

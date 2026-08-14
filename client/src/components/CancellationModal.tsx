@@ -123,7 +123,7 @@ export function CancellationModal() {
                       Cancel / Release Reservation
                     </h2>
                     <p style={{ fontSize: '13px', color: '#667085' }}>
-                      Slot {selectedSlot?.label} · Tomorrow
+                      Slot {selectedSlot ? `${selectedSlot.floor_id.replace('floor-', '').toUpperCase()} - ${selectedSlot.label}-${selectedSlot.position}` : ''} · Tomorrow
                     </p>
                   </div>
                 </div>
