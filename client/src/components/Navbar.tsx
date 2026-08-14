@@ -112,7 +112,7 @@ export function Navbar() {
                 transition: 'all 0.2s',
               }}
             >
-              Manage Parking
+              Book Your Slot
             </button>
           </div>
         )}
