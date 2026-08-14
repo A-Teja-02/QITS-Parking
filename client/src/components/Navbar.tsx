@@ -176,7 +176,7 @@ export function Navbar() {
                 position: 'absolute',
                 right: 0,
                 top: 'calc(100% + 8px)',
-                width: '240px',
+                width: '300px',
                 background: '#FFFFFF',
                 border: '1px solid #E4E7EC',
                 borderRadius: '12px',
@@ -213,10 +213,33 @@ export function Navbar() {
                     {user.avatar_initials}
                   </div>
                   <div>
-                    <p style={{ fontSize: '14px', fontWeight: '600', color: '#101828', lineHeight: '1.3' }}>
+                    <p
+                      style={{
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        color: '#101828',
+                        lineHeight: '1.3',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        width: '210px',
+                      }}
+                      title={user.name || 'Set Name'}
+                    >
                       {user.name || 'Set Name'}
                     </p>
-                    <p style={{ fontSize: '12px', color: '#667085', lineHeight: '1.3' }}>
+                    <p
+                      style={{
+                        fontSize: '12px',
+                        color: '#667085',
+                        lineHeight: '1.3',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        width: '210px',
+                      }}
+                      title={user.email}
+                    >
                       {user.email}
                     </p>
                   </div>
