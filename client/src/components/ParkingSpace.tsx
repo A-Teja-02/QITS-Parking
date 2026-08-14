@@ -269,7 +269,7 @@ export function ParkingSpace({
           </>
         )}
         {state === 'reserved_manager' && (
-          <div style={{ fontWeight: '700', color: (designation || manager_role !== 'hr') ? '#92400E' : '#6D28D9', fontSize: '15px', lineHeight: 1.3 }}>
+          <div style={{ fontWeight: '700', color: '#92400E', fontSize: '15px', lineHeight: 1.3 }}>
             {displayName || (manager_role === 'hr' ? 'HR' : 'Manager')}
           </div>
         )}
