@@ -5,6 +5,7 @@ Parking tables remain in db.json — only auth lives in the database.
 Uses String-based UUIDs for SQLite compatibility during local development.
 When deploying to PostgreSQL, these map to VARCHAR columns (still works fine).
 """
+import os
 import uuid
 from datetime import datetime, timezone
 
@@ -13,6 +14,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.sql import text
 from db import Base
+from config import settings
 
 
 def utcnow():
@@ -119,7 +121,7 @@ class Reservation(Base):
             "idx_unique_active_slot_date",
             "slot_id",
             "date",
-            unique=True,
+            unique=not (settings.DATABASE_URL.startswith("mysql") or os.getenv("IS_MIGRATION_TO_MYSQL") == "true"),
             postgresql_where=text("status = 'active'"),
             sqlite_where=text("status = 'active'")
         ),
@@ -127,7 +129,7 @@ class Reservation(Base):
             "idx_unique_active_user_date",
             "user_id",
             "date",
-            unique=True,
+            unique=not (settings.DATABASE_URL.startswith("mysql") or os.getenv("IS_MIGRATION_TO_MYSQL") == "true"),
             postgresql_where=text("status = 'active'"),
             sqlite_where=text("status = 'active'")
         ),
