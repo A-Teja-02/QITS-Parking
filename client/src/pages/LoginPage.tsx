@@ -302,28 +302,6 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
             </button>
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
           </form>
-
-          {/* Features list section */}
-          <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.1)', marginTop: '28px', paddingTop: '20px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'rgba(255, 255, 255, 0.7)', fontSize: '13px' }}>
-                <Car size={16} color="#38BDF8" style={{ flexShrink: 0 }} />
-                <span>Real-time parking availability</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'rgba(255, 255, 255, 0.7)', fontSize: '13px' }}>
-                <Clock size={16} color="#38BDF8" style={{ flexShrink: 0 }} />
-                <span>Book for the next business day</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'rgba(255, 255, 255, 0.7)', fontSize: '13px' }}>
-                <Shield size={16} color="#38BDF8" style={{ flexShrink: 0 }} />
-                <span>Secure role-based access</span>
-              </div>
-            </div>
-          </div>
-
-          <p style={{ textAlign: 'center', fontSize: '11px', color: '#94A3B8', marginTop: '20px', marginBottom: 0, opacity: 0.8 }}>
-            By signing in, you agree to our Terms of Service and Privacy Policy.
-          </p>
         </motion.div>
       </div>
     </div>
