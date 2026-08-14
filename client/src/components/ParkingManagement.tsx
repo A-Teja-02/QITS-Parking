@@ -199,7 +199,7 @@ export function ParkingManagement() {
             <div key={slot.id} style={{ padding: '16px', border: '1px solid #E4E7EC', borderRadius: '12px', background: '#F9FAFB' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                 <div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#101828' }}>{slot.label}</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#101828' }}>{slot.label}-{slot.position}</div>
                   <div style={{ fontSize: '12px', color: '#667085', marginTop: '4px', textTransform: 'capitalize' }}>Status: {slot.status}</div>
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
@@ -226,7 +226,7 @@ export function ParkingManagement() {
       {editingSlot && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
           <div style={{ background: '#FFF', padding: '32px', borderRadius: '16px', width: '400px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '24px' }}>Edit Slot {editingSlot.label}</h3>
+            <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '24px' }}>Edit Slot {editingSlot.label}-{editingSlot.position}</h3>
             <form onSubmit={handleSave}>
               <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>Status</label>
