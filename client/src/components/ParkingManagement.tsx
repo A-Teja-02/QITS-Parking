@@ -194,7 +194,7 @@ export function ParkingManagement() {
           </button>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '16px' }}>
           {floorSlots.map(slot => (
             <div key={slot.id} style={{ padding: '16px', border: '1px solid #E4E7EC', borderRadius: '12px', background: '#F9FAFB' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
