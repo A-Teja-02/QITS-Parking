@@ -1,7 +1,7 @@
 from typing import List, Optional, Dict, Any
 from sqlalchemy.orm import Session
 from models.schemas import Floor as FloorSchema, Slot as SlotSchema, ManagerRelease as ManagerReleaseSchema
-from db.models import Floor, ParkingSlot, ManagerRelease, Employee, Reservation
+from db.models import Floor, ParkingSlot, ManagerRelease, Employee, Reservation, Notification
 
 def get_all_floors(db: Session) -> List[FloorSchema]:
     floors = db.query(Floor).order_by(Floor.order).all()
@@ -274,6 +274,34 @@ def cancel_manager_release(db: Session, manager_id: str, slot_id: str, release_d
     ).first()
     
     if release:
+        # Check for any active employee reservation on this slot on this date
+        reservation = db.query(Reservation).filter(
+            Reservation.slot_id == slot_id,
+            Reservation.date == release_date,
+            Reservation.status == "active"
+        ).first()
+        
+        if reservation:
+            # 1. Cancel the employee's reservation
+            reservation.status = "cancelled"
+            
+            # 2. Get manager's name
+            manager = db.query(Employee).filter(Employee.id == manager_id).first()
+            manager_name = manager.name if manager else "Manager"
+            
+            # 3. Format date to dd/mm/yyyy
+            parts = release_date.split('-')
+            formatted_date = f"{parts[2]}/{parts[1]}/{parts[0]}" if len(parts) == 3 else release_date
+            
+            # 4. Notify employee in app
+            slot_label = f"{slot.label}-{slot.position}" if "-" not in slot.label else slot.label
+            message = f"Your reservation on slot {slot_label} for {formatted_date} was reclaimed by {manager_name}. Please book another slot."
+            notification = Notification(
+                user_id=reservation.user_id,
+                message=message
+            )
+            db.add(notification)
+            
         db.delete(release)
         db.commit()
         return True

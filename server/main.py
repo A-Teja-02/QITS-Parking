@@ -9,7 +9,7 @@ load_dotenv()
 from routers import reservations, slots, auth, users
 
 # Import models so tables are registered with Base
-from db.models import Employee, OTPVerification, PasswordReset  # noqa: F401
+from db.models import Employee, OTPVerification, PasswordReset, Notification  # noqa: F401
 from db import engine, Base
 
 app = FastAPI(

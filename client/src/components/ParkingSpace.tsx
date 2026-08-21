@@ -304,7 +304,7 @@ export function ParkingSpace({
           letterSpacing: '0.05em',
         }}
       >
-        {slot.label}
+        {slot.label && slot.label.includes('-') ? slot.label : `${slot.label}-${slot.position}`}
       </div>
 
       {(state === 'available' || state === 'released_manager') && isClickable && (

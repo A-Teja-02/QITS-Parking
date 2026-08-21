@@ -9,7 +9,7 @@ import { formatDateDMY } from '../utils/date';
 
 export function ManagerPanel() {
   const { user } = useAuthStore();
-  const { slots, managerReleases, tomorrowDate, fetchManagerReleases } = useParkingStore();
+  const { slots, managerReleases, tomorrowDate, fetchManagerReleases, selectedDate } = useParkingStore();
   const { addToast } = useAppStore();
   const [isReleasing, setIsReleasing] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -71,7 +71,14 @@ export function ManagerPanel() {
         addToast({ type: 'success', message: `You released slot from ${formatDateDMY(startDate)} to ${formatDateDMY(endDate)}` });
       }
       
-      if (tomorrowDate) {
+      // Refresh state
+      await useParkingStore.getState().fetchSlots();
+      if (selectedDate) {
+        await useParkingStore.getState().fetchReservations(selectedDate);
+        await fetchManagerReleases(selectedDate);
+      }
+      await useParkingStore.getState().fetchTodayAvailability();
+      if (tomorrowDate && tomorrowDate !== selectedDate) {
         await fetchManagerReleases(tomorrowDate);
       }
       setShowModal(false);
@@ -105,7 +112,14 @@ export function ManagerPanel() {
         addToast({ type: 'success', message: `You reclaimed slot from ${formatDateDMY(reclaimStartDate)} to ${formatDateDMY(reclaimEndDate)}` });
       }
       
-      if (tomorrowDate) {
+      // Refresh state
+      await useParkingStore.getState().fetchSlots();
+      if (selectedDate) {
+        await useParkingStore.getState().fetchReservations(selectedDate);
+        await fetchManagerReleases(selectedDate);
+      }
+      await useParkingStore.getState().fetchTodayAvailability();
+      if (tomorrowDate && tomorrowDate !== selectedDate) {
         await fetchManagerReleases(tomorrowDate);
       }
       setShowReclaimModal(false);
@@ -121,7 +135,17 @@ export function ManagerPanel() {
     setIsReleasing(true);
     try {
       await api.slots.cancelRelease(mySlot.id, { date: tomorrowDate });
-      await fetchManagerReleases(tomorrowDate);
+      
+      // Refresh state
+      await useParkingStore.getState().fetchSlots();
+      if (selectedDate) {
+        await useParkingStore.getState().fetchReservations(selectedDate);
+        await fetchManagerReleases(selectedDate);
+      }
+      await useParkingStore.getState().fetchTodayAvailability();
+      if (tomorrowDate && tomorrowDate !== selectedDate) {
+        await fetchManagerReleases(tomorrowDate);
+      }
       addToast({ type: 'success', message: 'Slot reserved back successfully.' });
     } catch (err: any) {
       addToast({ type: 'error', message: err.message || 'Failed to keep slot.' });
@@ -358,47 +382,59 @@ export function ManagerPanel() {
                           boxSizing: 'border-box'
                         }}
                       />
+                      {singleDate && (
+                        <div style={{ fontSize: '12px', color: '#1E3A5F', marginTop: '6px', fontWeight: '600' }}>
+                          Selected Date: {formatDateDMY(singleDate)}
+                        </div>
+                      )}
                     </div>
                   ) : (
-                    <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#344054', marginBottom: '8px' }}>From Date</label>
-                        <input
-                          type="date"
-                          value={startDate}
-                          onChange={e => handleDateChange(e.target.value, setStartDate)}
-                          style={{
-                            width: '100%',
-                            padding: '10px 14px',
-                            borderRadius: '10px',
-                            border: '1px solid #D1D5DB',
-                            fontSize: '14px',
-                            color: '#101828',
-                            background: '#FFFFFF',
-                            outline: 'none',
-                            boxSizing: 'border-box'
-                          }}
-                        />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+                      <div style={{ display: 'flex', gap: '12px' }}>
+                        <div style={{ flex: 1 }}>
+                          <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#344054', marginBottom: '8px' }}>From Date</label>
+                          <input
+                            type="date"
+                            value={startDate}
+                            onChange={e => handleDateChange(e.target.value, setStartDate)}
+                            style={{
+                              width: '100%',
+                              padding: '10px 14px',
+                              borderRadius: '10px',
+                              border: '1px solid #D1D5DB',
+                              fontSize: '14px',
+                              color: '#101828',
+                              background: '#FFFFFF',
+                              outline: 'none',
+                              boxSizing: 'border-box'
+                            }}
+                          />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#344054', marginBottom: '8px' }}>To Date</label>
+                          <input
+                            type="date"
+                            value={endDate}
+                            onChange={e => handleDateChange(e.target.value, setEndDate)}
+                            style={{
+                              width: '100%',
+                              padding: '10px 14px',
+                              borderRadius: '10px',
+                              border: '1px solid #D1D5DB',
+                              fontSize: '14px',
+                              color: '#101828',
+                              background: '#FFFFFF',
+                              outline: 'none',
+                              boxSizing: 'border-box'
+                            }}
+                          />
+                        </div>
                       </div>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#344054', marginBottom: '8px' }}>To Date</label>
-                        <input
-                          type="date"
-                          value={endDate}
-                          onChange={e => handleDateChange(e.target.value, setEndDate)}
-                          style={{
-                            width: '100%',
-                            padding: '10px 14px',
-                            borderRadius: '10px',
-                            border: '1px solid #D1D5DB',
-                            fontSize: '14px',
-                            color: '#101828',
-                            background: '#FFFFFF',
-                            outline: 'none',
-                            boxSizing: 'border-box'
-                          }}
-                        />
-                      </div>
+                      {startDate && endDate && (
+                        <div style={{ fontSize: '12px', color: '#1E3A5F', fontWeight: '600' }}>
+                          Selected Range: {formatDateDMY(startDate)} to {formatDateDMY(endDate)}
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -563,47 +599,59 @@ export function ManagerPanel() {
                           boxSizing: 'border-box'
                         }}
                       />
+                      {reclaimSingleDate && (
+                        <div style={{ fontSize: '12px', color: '#059669', marginTop: '6px', fontWeight: '600' }}>
+                          Selected Date: {formatDateDMY(reclaimSingleDate)}
+                        </div>
+                      )}
                     </div>
                   ) : (
-                    <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#344054', marginBottom: '8px' }}>From Date</label>
-                        <input
-                          type="date"
-                          value={reclaimStartDate}
-                          onChange={e => handleDateChange(e.target.value, setReclaimStartDate)}
-                          style={{
-                            width: '100%',
-                            padding: '10px 14px',
-                            borderRadius: '10px',
-                            border: '1px solid #D1D5DB',
-                            fontSize: '14px',
-                            color: '#101828',
-                            background: '#FFFFFF',
-                            outline: 'none',
-                            boxSizing: 'border-box'
-                          }}
-                        />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+                      <div style={{ display: 'flex', gap: '12px' }}>
+                        <div style={{ flex: 1 }}>
+                          <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#344054', marginBottom: '8px' }}>From Date</label>
+                          <input
+                            type="date"
+                            value={reclaimStartDate}
+                            onChange={e => handleDateChange(e.target.value, setReclaimStartDate)}
+                            style={{
+                              width: '100%',
+                              padding: '10px 14px',
+                              borderRadius: '10px',
+                              border: '1px solid #D1D5DB',
+                              fontSize: '14px',
+                              color: '#101828',
+                              background: '#FFFFFF',
+                              outline: 'none',
+                              boxSizing: 'border-box'
+                            }}
+                          />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#344054', marginBottom: '8px' }}>To Date</label>
+                          <input
+                            type="date"
+                            value={reclaimEndDate}
+                            onChange={e => handleDateChange(e.target.value, setReclaimEndDate)}
+                            style={{
+                              width: '100%',
+                              padding: '10px 14px',
+                              borderRadius: '10px',
+                              border: '1px solid #D1D5DB',
+                              fontSize: '14px',
+                              color: '#101828',
+                              background: '#FFFFFF',
+                              outline: 'none',
+                              boxSizing: 'border-box'
+                            }}
+                          />
+                        </div>
                       </div>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#344054', marginBottom: '8px' }}>To Date</label>
-                        <input
-                          type="date"
-                          value={reclaimEndDate}
-                          onChange={e => handleDateChange(e.target.value, setReclaimEndDate)}
-                          style={{
-                            width: '100%',
-                            padding: '10px 14px',
-                            borderRadius: '10px',
-                            border: '1px solid #D1D5DB',
-                            fontSize: '14px',
-                            color: '#101828',
-                            background: '#FFFFFF',
-                            outline: 'none',
-                            boxSizing: 'border-box'
-                          }}
-                        />
-                      </div>
+                      {reclaimStartDate && reclaimEndDate && (
+                        <div style={{ fontSize: '12px', color: '#059669', fontWeight: '600' }}>
+                          Selected Range: {formatDateDMY(reclaimStartDate)} to {formatDateDMY(reclaimEndDate)}
+                        </div>
+                      )}
                     </div>
                   )}
 

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar } from 'lucide-react';
 import { useParkingStore } from '../store/useParkingStore';
@@ -13,6 +13,8 @@ import { FloorTabs } from '../components/FloorTabs';
 import { ManagerReleaseModal } from '../components/ManagerReleaseModal';
 import { ReservationHistory } from '../components/ReservationHistory';
 import { formatDisplayDate } from '../utils/date';
+import { api } from '../services/api';
+import type { Notification } from '../types';
 
 export function DashboardPage() {
   const { user } = useAuthStore();
@@ -32,11 +34,32 @@ export function DashboardPage() {
   } = useParkingStore();
   
   const myReservation = useMyReservation();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [currentNotification, setCurrentNotification] = useState<Notification | null>(null);
 
   useEffect(() => {
     fetchFloors();
     fetchTodayAvailability();
   }, [fetchFloors, fetchTodayAvailability]);
+
+  useEffect(() => {
+    const fetchNotifs = () => {
+      if (user && user.role === 'employee') {
+        api.reservations.getNotifications()
+          .then(data => {
+            setNotifications(data);
+            if (data.length > 0 && !currentNotification) {
+              setCurrentNotification(data[0]);
+            }
+          })
+          .catch(err => console.error("Error fetching notifications:", err));
+      }
+    };
+
+    fetchNotifs();
+    const interval = setInterval(fetchNotifs, 10000);
+    return () => clearInterval(interval);
+  }, [user, currentNotification]);
 
   useEffect(() => {
     fetchSlots(); // Always fetch all slots so that global statistics are correct
@@ -278,6 +301,134 @@ export function DashboardPage() {
       <ReservationModal />
       <CancellationModal />
       <ManagerReleaseModal />
+
+      {currentNotification && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(15, 23, 42, 0.6)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 9999,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: '#FFFFFF',
+            borderRadius: '16px',
+            maxWidth: '480px',
+            width: '100%',
+            padding: '24px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            border: '1px solid #E2E8F0',
+            textAlign: 'center'
+          }}>
+            <div style={{
+              width: '56px',
+              height: '56px',
+              borderRadius: '50%',
+              background: '#FEE2E2',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 16px'
+            }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+            </div>
+            
+            <h3 style={{
+              fontSize: '18px',
+              fontWeight: '700',
+              color: '#0F172A',
+              marginBottom: '10px'
+            }}>
+              Reservation Reclaimed
+            </h3>
+            
+            <p style={{
+              fontSize: '14px',
+              color: '#475569',
+              lineHeight: '1.6',
+              marginBottom: '24px'
+            }}>
+              {currentNotification.message}
+            </p>
+            
+            <div style={{
+              display: 'flex',
+              gap: '12px'
+            }}>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await api.reservations.markNotificationRead(currentNotification.id);
+                    setNotifications(prev => prev.filter(n => n.id !== currentNotification.id));
+                    setCurrentNotification(null);
+                  } catch (err) {
+                    console.error("Error dismissing notification:", err);
+                  }
+                }}
+                style={{
+                  flex: 1,
+                  padding: '11px 16px',
+                  borderRadius: '10px',
+                  border: '1px solid #E2E8F0',
+                  background: '#FFFFFF',
+                  color: '#475569',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                Dismiss
+              </button>
+              
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await api.reservations.markNotificationRead(currentNotification.id);
+                    const match = currentNotification.message.match(/for (\d{2})\/(\d{2})\/(\d{4})/);
+                    if (match) {
+                      const day = match[1];
+                      const month = match[2];
+                      const year = match[3];
+                      const isoDate = `${year}-${month}-${day}`;
+                      setSelectedDate(isoDate);
+                    }
+                    setNotifications(prev => prev.filter(n => n.id !== currentNotification.id));
+                    setCurrentNotification(null);
+                  } catch (err) {
+                    console.error("Error redirecting notification:", err);
+                  }
+                }}
+                style={{
+                  flex: 1.5,
+                  padding: '11px 16px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  background: '#1E3A5F',
+                  color: '#FFFFFF',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                Book Another Slot
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

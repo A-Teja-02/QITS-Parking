@@ -26,7 +26,8 @@ export function ReservationHistory() {
           const mapping: Record<string, string> = {};
           slotsData.forEach(slot => {
             const floorName = slot.floor_id.replace('floor-', '').toUpperCase();
-            mapping[slot.id] = `${floorName} - ${slot.label}`;
+            const slotLabel = slot.label.includes('-') ? slot.label : `${slot.label}-${slot.position}`;
+            mapping[slot.id] = `${floorName} - ${slotLabel}`;
           });
           setSlotMap(mapping);
         })

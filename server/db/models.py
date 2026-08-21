@@ -151,3 +151,16 @@ class ManagerRelease(Base):
     def __repr__(self):
         return f"<ManagerRelease {self.slot_id} on {self.release_date}>"
 
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id = Column(String(36), primary_key=True, default=new_uuid)
+    user_id = Column(String(36), ForeignKey("employees.id"), nullable=False)
+    message = Column(Text, nullable=False)
+    is_read = Column(Boolean, nullable=False, default=False)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+    def __repr__(self):
+        return f"<Notification user={self.user_id} read={self.is_read}>"
+

@@ -260,7 +260,7 @@ export function ParkingManagement() {
                 <select value={managerId} onChange={e => setManagerId(e.target.value)} style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #D1D5DB' }}>
                   <option value="">None</option>
                   {managers.map(m => (
-                    <option key={m.id} value={m.id}>{getSpecialDesignation(m.name) || m.name}</option>
+                    <option key={m.id} value={m.id}>{getSpecialDesignation(m.name) || m.name || m.email}</option>
                   ))}
                 </select>
               </div>
@@ -305,7 +305,7 @@ export function ParkingManagement() {
                 <select value={newSlot.reserved_for_manager_id} onChange={e => setNewSlot({ ...newSlot, reserved_for_manager_id: e.target.value })} style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #D1D5DB' }}>
                   <option value="">None</option>
                   {managers.map(m => (
-                    <option key={m.id} value={m.id}>{getSpecialDesignation(m.name) || m.name}</option>
+                    <option key={m.id} value={m.id}>{getSpecialDesignation(m.name) || m.name || m.email}</option>
                   ))}
                 </select>
               </div>

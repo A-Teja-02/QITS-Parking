@@ -113,3 +113,11 @@ class ManagerRelease(BaseModel):
     manager_id: str
     slot_id: str
     release_date: str
+
+
+class NotificationSchema(BaseModel):
+    id: str
+    user_id: str
+    message: str
+    is_read: bool
+    created_at: str

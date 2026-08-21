@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Body
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 from models.schemas import Floor, Slot, ManagerRelease, User
@@ -65,7 +65,7 @@ def remove_manager(slot_id: str, hr: User = Depends(get_hr_user), db: Session = 
     return {"status": "success"}
 
 @router.post("/slots/{slot_id}/release")
-def release_slot(slot_id: str, data: dict, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def release_slot(slot_id: str, data: dict = Body(...), user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     if user.role != "manager" and not is_hr(user):
         raise HTTPException(status_code=403, detail="Not authorized")
     try:
@@ -99,7 +99,7 @@ def get_manager_releases(date: str, user: User = Depends(get_current_user), db: 
     return parking_service.get_manager_releases(db, date)
 
 @router.delete("/slots/{slot_id}/release")
-def cancel_release(slot_id: str, data: dict, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def cancel_release(slot_id: str, data: dict = Body(...), user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     if user.role != "manager" and not is_hr(user):
         raise HTTPException(status_code=403, detail="Not authorized")
     try:

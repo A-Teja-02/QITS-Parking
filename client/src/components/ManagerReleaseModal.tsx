@@ -5,6 +5,7 @@ import { useAuthStore } from '../store/useAuthStore';
 import { useParkingStore } from '../store/useParkingStore';
 import { useAppStore } from '../store/useAppStore';
 import { api } from '../services/api';
+import { formatDateDMY } from '../utils/date';
 
 export function ManagerReleaseModal() {
   const { user } = useAuthStore();
@@ -18,27 +19,43 @@ export function ManagerReleaseModal() {
 
   const [isReleasing, setIsReleasing] = useState(false);
   const [releaseType, setReleaseType] = useState<'single' | 'range'>('single');
-  
-  const initialDate = selectedDate || tomorrowDate || '';
-  const [singleDate, setSingleDate] = useState(initialDate);
-  const [startDate, setStartDate] = useState(initialDate);
-  const [endDate, setEndDate] = useState(initialDate);
+  const [singleDate, setSingleDate] = useState(selectedDate || tomorrowDate || '');
+  const [startDate, setStartDate] = useState(selectedDate || tomorrowDate || '');
+  const [endDate, setEndDate] = useState(selectedDate || tomorrowDate || '');
 
-  // Update dates when selectedDate or tomorrowDate changes
+  // Reset dates when modal opens/selected date changes
   useEffect(() => {
-    const activeDate = selectedDate || tomorrowDate || '';
-    if (activeDate) {
-      setSingleDate(activeDate);
-      setStartDate(activeDate);
-      setEndDate(activeDate);
+    if (showManagerReleaseModal) {
+      setSingleDate(selectedDate || tomorrowDate || '');
+      setStartDate(selectedDate || tomorrowDate || '');
+      setEndDate(selectedDate || tomorrowDate || '');
     }
-  }, [selectedDate, tomorrowDate]);
+  }, [showManagerReleaseModal, selectedDate, tomorrowDate]);
 
-  if (!user || !selectedSlot) return null;
+  if (!selectedSlot) return null;
 
-  const isCurrentlyReleased = releaseType === 'single' && managerReleases.some(
+  // Check if currently released (for toggle)
+  const isCurrentlyReleased = releaseType === 'single' ? managerReleases.some(
     r => r.slot_id === selectedSlot.id && r.release_date === singleDate
+  ) : managerReleases.some(
+    r => r.slot_id === selectedSlot.id && r.release_date >= startDate && r.release_date <= endDate
   );
+
+  const isWeekendDay = (dateStr: string) => {
+    if (!dateStr) return false;
+    const dateObj = new Date(dateStr + 'T00:00:00');
+    const day = dateObj.getDay();
+    return day === 6 || day === 0; // 6 = Saturday, 0 = Sunday
+  };
+
+  const handleDateChange = (val: string, setter: (v: string) => void) => {
+    if (val && isWeekendDay(val)) {
+      addToast({ type: 'error', message: 'Saturdays and Sundays cannot be selected.' });
+      setter('');
+    } else {
+      setter(val);
+    }
+  };
 
   const handleRelease = async () => {
     setIsReleasing(true);
@@ -49,6 +66,7 @@ export function ManagerReleaseModal() {
           return;
         }
         await api.slots.release(selectedSlot.id, { date: singleDate });
+        addToast({ type: 'success', message: `You released slot for ${formatDateDMY(singleDate)}` });
       } else {
         if (!startDate || !endDate) {
           addToast({ type: 'error', message: 'Please select start and end dates.' });
@@ -59,6 +77,7 @@ export function ManagerReleaseModal() {
           return;
         }
         await api.slots.release(selectedSlot.id, { start_date: startDate, end_date: endDate });
+        addToast({ type: 'success', message: `You released slot from ${formatDateDMY(startDate)} to ${formatDateDMY(endDate)}` });
       }
       
       // Refresh status
@@ -71,7 +90,6 @@ export function ManagerReleaseModal() {
         await fetchManagerReleases(tomorrowDate);
       }
       
-      addToast({ type: 'success', message: 'Slot released successfully.' });
       setShowManagerReleaseModal(false);
     } catch (err: any) {
       addToast({ type: 'error', message: err.message || 'Failed to release slot.' });
@@ -83,7 +101,25 @@ export function ManagerReleaseModal() {
   const handleReclaim = async () => {
     setIsReleasing(true);
     try {
-      await api.slots.cancelRelease(selectedSlot.id, { date: singleDate });
+      if (releaseType === 'single') {
+        if (!singleDate) {
+          addToast({ type: 'error', message: 'Please select a date.' });
+          return;
+        }
+        await api.slots.cancelRelease(selectedSlot.id, { date: singleDate });
+        addToast({ type: 'success', message: `You reclaimed slot for ${formatDateDMY(singleDate)}` });
+      } else {
+        if (!startDate || !endDate) {
+          addToast({ type: 'error', message: 'Please select start and end dates.' });
+          return;
+        }
+        if (new Date(startDate) > new Date(endDate)) {
+          addToast({ type: 'error', message: 'Start date must be before or equal to end date.' });
+          return;
+        }
+        await api.slots.cancelRelease(selectedSlot.id, { start_date: startDate, end_date: endDate });
+        addToast({ type: 'success', message: `You reclaimed slot from ${formatDateDMY(startDate)} to ${formatDateDMY(endDate)}` });
+      }
       
       // Refresh status
       await useParkingStore.getState().fetchSlots();
@@ -95,7 +131,6 @@ export function ManagerReleaseModal() {
         await fetchManagerReleases(tomorrowDate);
       }
       
-      addToast({ type: 'success', message: 'Slot reclaimed successfully.' });
       setShowManagerReleaseModal(false);
     } catch (err: any) {
       addToast({ type: 'error', message: err.message || 'Failed to reclaim slot.' });
@@ -210,7 +245,7 @@ export function ManagerReleaseModal() {
                     <input
                       type="date"
                       value={singleDate}
-                      onChange={e => setSingleDate(e.target.value)}
+                      onChange={e => handleDateChange(e.target.value, setSingleDate)}
                       style={{
                         width: '100%',
                         padding: '10px 14px',
@@ -223,47 +258,59 @@ export function ManagerReleaseModal() {
                         boxSizing: 'border-box'
                       }}
                     />
+                    {singleDate && (
+                      <div style={{ fontSize: '12px', color: '#1E3A5F', marginTop: '6px', fontWeight: '600' }}>
+                        Selected Date: {formatDateDMY(singleDate)}
+                      </div>
+                    )}
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
-                    <div style={{ flex: 1 }}>
-                      <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#344054', marginBottom: '8px' }}>From Date</label>
-                      <input
-                        type="date"
-                        value={startDate}
-                        onChange={e => setStartDate(e.target.value)}
-                        style={{
-                          width: '100%',
-                          padding: '10px 14px',
-                          borderRadius: '10px',
-                          border: '1px solid #D1D5DB',
-                          fontSize: '14px',
-                          color: '#101828',
-                          background: '#FFFFFF',
-                          outline: 'none',
-                          boxSizing: 'border-box'
-                        }}
-                      />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#344054', marginBottom: '8px' }}>From Date</label>
+                        <input
+                          type="date"
+                          value={startDate}
+                          onChange={e => handleDateChange(e.target.value, setStartDate)}
+                          style={{
+                            width: '100%',
+                            padding: '10px 14px',
+                            borderRadius: '10px',
+                            border: '1px solid #D1D5DB',
+                            fontSize: '14px',
+                            color: '#101828',
+                            background: '#FFFFFF',
+                            outline: 'none',
+                            boxSizing: 'border-box'
+                          }}
+                        />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#344054', marginBottom: '8px' }}>To Date</label>
+                        <input
+                          type="date"
+                          value={endDate}
+                          onChange={e => handleDateChange(e.target.value, setEndDate)}
+                          style={{
+                            width: '100%',
+                            padding: '10px 14px',
+                            borderRadius: '10px',
+                            border: '1px solid #D1D5DB',
+                            fontSize: '14px',
+                            color: '#101828',
+                            background: '#FFFFFF',
+                            outline: 'none',
+                            boxSizing: 'border-box'
+                          }}
+                        />
+                      </div>
                     </div>
-                    <div style={{ flex: 1 }}>
-                      <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#344054', marginBottom: '8px' }}>To Date</label>
-                      <input
-                        type="date"
-                        value={endDate}
-                        onChange={e => setEndDate(e.target.value)}
-                        style={{
-                          width: '100%',
-                          padding: '10px 14px',
-                          borderRadius: '10px',
-                          border: '1px solid #D1D5DB',
-                          fontSize: '14px',
-                          color: '#101828',
-                          background: '#FFFFFF',
-                          outline: 'none',
-                          boxSizing: 'border-box'
-                        }}
-                      />
-                    </div>
+                    {startDate && endDate && (
+                      <div style={{ fontSize: '12px', color: '#1E3A5F', fontWeight: '600' }}>
+                        Selected Range: {formatDateDMY(startDate)} to {formatDateDMY(endDate)}
+                      </div>
+                    )}
                   </div>
                 )}
 

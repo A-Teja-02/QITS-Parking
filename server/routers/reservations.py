@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from models.schemas import Reservation, ReservationCreate, User
+from models.schemas import Reservation, ReservationCreate, User, NotificationSchema
 from services import reservation_service
 from routers.auth import get_current_user, get_hr_user, is_hr
 from db import get_db
@@ -41,3 +41,18 @@ def get_history(user_id: str, user: User = Depends(get_current_user), db: Sessio
     if not is_hr(user) and user.id != user_id:
         raise HTTPException(status_code=403, detail="Unauthorized")
     return reservation_service.get_user_history(db, user_id)
+
+
+@router.get("/notifications", response_model=List[NotificationSchema])
+def get_notifications(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Get active unread notifications for the current user."""
+    return reservation_service.get_unread_notifications(db, user.id)
+
+
+@router.post("/notifications/{notification_id}/read")
+def mark_read(notification_id: str, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Mark a notification as read."""
+    success = reservation_service.mark_notification_read(db, user.id, notification_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Notification not found")
+    return {"status": "success"}

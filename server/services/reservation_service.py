@@ -3,8 +3,8 @@ from datetime import datetime, date, timedelta
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from models.schemas import Reservation as ReservationSchema, ReservationCreate
-from db.models import Reservation, ParkingSlot, ManagerRelease
+from models.schemas import Reservation as ReservationSchema, ReservationCreate, NotificationSchema
+from db.models import Reservation, ParkingSlot, ManagerRelease, Notification
 
 def get_tomorrow_date() -> str:
     today_weekday = date.today().weekday()
@@ -189,4 +189,33 @@ def get_all_reservations(db: Session) -> List[ReservationSchema]:
             status=r.status
         ) for r in reservations
     ]
+
+
+def get_unread_notifications(db: Session, user_id: str) -> List[NotificationSchema]:
+    notifications = db.query(Notification).filter(
+        Notification.user_id == user_id,
+        Notification.is_read == False
+    ).order_by(Notification.created_at.desc()).all()
+    
+    return [
+        NotificationSchema(
+            id=n.id,
+            user_id=n.user_id,
+            message=n.message,
+            is_read=n.is_read,
+            created_at=n.created_at.isoformat()
+        ) for n in notifications
+    ]
+
+
+def mark_notification_read(db: Session, user_id: str, notification_id: str) -> bool:
+    notification = db.query(Notification).filter(
+        Notification.id == notification_id,
+        Notification.user_id == user_id
+    ).first()
+    if notification:
+        notification.is_read = True
+        db.commit()
+        return True
+    return False
 

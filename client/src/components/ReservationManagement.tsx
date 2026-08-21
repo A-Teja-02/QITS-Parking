@@ -2,11 +2,25 @@ import { useState, useEffect } from 'react';
 import { useAdminStore } from '../store/useAdminStore';
 import { useAppStore } from '../store/useAppStore';
 import { Search, Calendar, ShieldAlert, ChevronLeft, ChevronRight } from 'lucide-react';
-import { formatDisplayDate } from '../utils/date';
+import { formatDisplayDate, formatDateDMY } from '../utils/date';
+import { api } from '../services/api';
 
 export function ReservationManagement() {
   const { allReservations, users, fetchAllReservations } = useAdminStore();
   const [searchQuery, setSearchQuery] = useState('');
+  const [slotMap, setSlotMap] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    api.slots.list().then(slotsData => {
+      const mapping: Record<string, string> = {};
+      slotsData.forEach(slot => {
+        const floorName = slot.floor_id.replace('floor-', '').toUpperCase();
+        const slotLabel = slot.label.includes('-') ? slot.label : `${slot.label}-${slot.position}`;
+        mapping[slot.id] = `${floorName} - ${slotLabel}`;
+      });
+      setSlotMap(mapping);
+    }).catch(err => console.error(err));
+  }, []);
 
   const getTodayDateString = () => {
     const d = new Date();
@@ -98,73 +112,80 @@ export function ReservationManagement() {
           </div>
 
           {/* Date Selector with arrows */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <button
-              type="button"
-              onClick={handlePrevDate}
-              disabled={!dateFilter}
-              style={{
-                background: 'none',
-                border: '1px solid #D0D5DD',
-                borderRadius: '8px',
-                padding: '9px',
-                cursor: dateFilter ? 'pointer' : 'not-allowed',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#344054',
-                opacity: dateFilter ? 1 : 0.5,
-                transition: 'background 150ms'
-              }}
-              onMouseEnter={(e) => { if (dateFilter) e.currentTarget.style.background = '#F9FAFB'; }}
-              onMouseLeave={(e) => { if (dateFilter) e.currentTarget.style.background = 'none'; }}
-              title="Previous Day"
-            >
-              <ChevronLeft size={16} />
-            </button>
-
-            <div style={{ position: 'relative', width: '160px' }}>
-              <Calendar size={16} color="#667085" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
-              <input
-                type="date"
-                value={dateFilter}
-                onChange={(e) => setDateFilter(e.target.value)}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <button
+                type="button"
+                onClick={handlePrevDate}
+                disabled={!dateFilter}
                 style={{
-                  width: '100%',
-                  padding: '9px 12px 9px 36px',
-                  borderRadius: '8px',
+                  background: 'none',
                   border: '1px solid #D0D5DD',
-                  fontSize: '14px',
+                  borderRadius: '8px',
+                  padding: '9px',
+                  cursor: dateFilter ? 'pointer' : 'not-allowed',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   color: '#344054',
-                  outline: 'none',
-                  boxSizing: 'border-box'
+                  opacity: dateFilter ? 1 : 0.5,
+                  transition: 'background 150ms'
                 }}
-              />
-            </div>
+                onMouseEnter={(e) => { if (dateFilter) e.currentTarget.style.background = '#F9FAFB'; }}
+                onMouseLeave={(e) => { if (dateFilter) e.currentTarget.style.background = 'none'; }}
+                title="Previous Day"
+              >
+                <ChevronLeft size={16} />
+              </button>
 
-            <button
-              type="button"
-              onClick={handleNextDate}
-              disabled={!dateFilter}
-              style={{
-                background: 'none',
-                border: '1px solid #D0D5DD',
-                borderRadius: '8px',
-                padding: '9px',
-                cursor: dateFilter ? 'pointer' : 'not-allowed',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#344054',
-                opacity: dateFilter ? 1 : 0.5,
-                transition: 'background 150ms'
-              }}
-              onMouseEnter={(e) => { if (dateFilter) e.currentTarget.style.background = '#F9FAFB'; }}
-              onMouseLeave={(e) => { if (dateFilter) e.currentTarget.style.background = 'none'; }}
-              title="Next Day"
-            >
-              <ChevronRight size={16} />
-            </button>
+              <div style={{ position: 'relative', width: '160px' }}>
+                <Calendar size={16} color="#667085" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+                <input
+                  type="date"
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '9px 12px 9px 36px',
+                    borderRadius: '8px',
+                    border: '1px solid #D0D5DD',
+                    fontSize: '14px',
+                    color: '#344054',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={handleNextDate}
+                disabled={!dateFilter}
+                style={{
+                  background: 'none',
+                  border: '1px solid #D0D5DD',
+                  borderRadius: '8px',
+                  padding: '9px',
+                  cursor: dateFilter ? 'pointer' : 'not-allowed',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#344054',
+                  opacity: dateFilter ? 1 : 0.5,
+                  transition: 'background 150ms'
+                }}
+                onMouseEnter={(e) => { if (dateFilter) e.currentTarget.style.background = '#F9FAFB'; }}
+                onMouseLeave={(e) => { if (dateFilter) e.currentTarget.style.background = 'none'; }}
+                title="Next Day"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+            {dateFilter && (
+              <div style={{ fontSize: '11px', color: '#475569', fontWeight: '600', marginRight: '4px' }}>
+                Filter Date: {formatDateDMY(dateFilter)}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -213,7 +234,7 @@ export function ReservationManagement() {
                     </td>
                     <td style={{ padding: '16px 24px' }}>
                       <span style={{ display: 'inline-flex', alignItems: 'center', padding: '4px 10px', background: '#F0FDF4', color: '#166534', border: '1px solid #BBF7D0', borderRadius: '12px', fontSize: '13px', fontWeight: '600' }}>
-                        {res.slot_id}
+                        {slotMap[res.slot_id] || res.slot_id}
                       </span>
                     </td>
                     <td style={{ padding: '16px 24px', fontSize: '14px', color: '#334155', fontWeight: '500' }}>

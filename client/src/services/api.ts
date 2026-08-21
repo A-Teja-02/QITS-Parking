@@ -1,4 +1,4 @@
-import type { Reservation, ReservationCreate, User, Floor, ParkingSlot, ManagerRelease } from '../types';
+import type { Reservation, ReservationCreate, User, Floor, ParkingSlot, ManagerRelease, Notification } from '../types';
 
 const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
@@ -147,6 +147,8 @@ export const api = {
     create: (data: ReservationCreate) => request<Reservation>('/reservations', { method: 'POST', body: JSON.stringify(data) }),
     cancel: (id: string) => request<void>(`/reservations/${id}`, { method: 'DELETE' }),
     history: (userId: string) => request<Reservation[]>(`/reservations/history/${userId}`),
+    getNotifications: () => request<Notification[]>('/reservations/notifications'),
+    markNotificationRead: (id: string) => request<void>(`/reservations/notifications/${id}/read`, { method: 'POST' }),
   },
 
   status: {
