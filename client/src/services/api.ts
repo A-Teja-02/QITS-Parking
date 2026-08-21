@@ -137,7 +137,7 @@ export const api = {
     assignManager: (id: string, manager_id: string) => request(`/slots/${id}/assign-manager`, { method: 'POST', body: JSON.stringify({ manager_id }) }),
     removeManager: (id: string) => request(`/slots/${id}/assign-manager`, { method: 'DELETE' }),
     release: (id: string, data: any) => request<ManagerRelease>(`/slots/${id}/release`, { method: 'POST', body: JSON.stringify(data) }),
-    cancelRelease: (id: string, date: string) => request<void>(`/slots/${id}/release`, { method: 'DELETE', body: JSON.stringify({ date }) }),
+    cancelRelease: (id: string, data: { date?: string; start_date?: string; end_date?: string }) => request<void>(`/slots/${id}/release`, { method: 'DELETE', body: JSON.stringify(data) }),
     getReserved: () => request<any[]>('/slots/reserved'),
     getReleases: (date: string) => request<ManagerRelease[]>(`/manager-releases?date=${date}`)
   },

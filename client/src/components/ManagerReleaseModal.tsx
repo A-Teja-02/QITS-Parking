@@ -83,7 +83,7 @@ export function ManagerReleaseModal() {
   const handleReclaim = async () => {
     setIsReleasing(true);
     try {
-      await api.slots.cancelRelease(selectedSlot.id, singleDate);
+      await api.slots.cancelRelease(selectedSlot.id, { date: singleDate });
       
       // Refresh status
       await useParkingStore.getState().fetchSlots();

@@ -12,6 +12,7 @@ import { useMyReservation } from '../hooks/useReservations';
 import { FloorTabs } from '../components/FloorTabs';
 import { ManagerReleaseModal } from '../components/ManagerReleaseModal';
 import { ReservationHistory } from '../components/ReservationHistory';
+import { formatDisplayDate } from '../utils/date';
 
 export function DashboardPage() {
   const { user } = useAuthStore();
@@ -257,7 +258,7 @@ export function DashboardPage() {
               />
               <p style={{ fontSize: '14px', color: '#1E3A5F', fontWeight: '500' }}>
                 You have a reservation for{' '}
-                <strong>{myReservation.slot_id}</strong> on <strong>{myReservation.date}</strong>.{' '}
+                <strong>{myReservation.slot_id}</strong> on <strong>{formatDisplayDate(myReservation.date)}</strong>.{' '}
                 <span style={{ color: '#4A6FA5' }}>Click your spot to release / cancel it.</span>
               </p>
             </motion.div>

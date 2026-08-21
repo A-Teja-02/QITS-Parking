@@ -108,12 +108,35 @@ def cancel_release(slot_id: str, data: dict, user: User = Depends(get_current_us
             raise HTTPException(status_code=403, detail="Cannot cancel another manager's release")
             
         date = data.get("date")
-        if not date:
-            raise HTTPException(status_code=400, detail="Date must be provided")
-            
-        success = parking_service.cancel_manager_release(db, manager_id, slot_id, date)
-        if not success:
-            raise HTTPException(status_code=404, detail="Release not found")
-        return {"status": "success"}
+        start_date_str = data.get("start_date")
+        end_date_str = data.get("end_date")
+        
+        if date:
+            success = parking_service.cancel_manager_release(db, manager_id, slot_id, date)
+            if not success:
+                raise HTTPException(status_code=404, detail="Release not found")
+            return {"status": "success"}
+        elif start_date_str and end_date_str:
+            from datetime import datetime, timedelta
+            try:
+                start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
+                end_date = datetime.strptime(end_date_str, "%Y-%m-%d").date()
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
+            if start_date > end_date:
+                raise HTTPException(status_code=400, detail="Start date must be before or equal to end date")
+                
+            delta = end_date - start_date
+            deleted_count = 0
+            for i in range(delta.days + 1):
+                curr_date_str = (start_date + timedelta(days=i)).strftime("%Y-%m-%d")
+                success = parking_service.cancel_manager_release(db, manager_id, slot_id, curr_date_str)
+                if success:
+                    deleted_count += 1
+            if deleted_count == 0:
+                raise HTTPException(status_code=404, detail="No releases found in the specified range")
+            return {"status": "success", "count": deleted_count}
+        else:
+            raise HTTPException(status_code=400, detail="Date or start_date/end_date must be provided")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
