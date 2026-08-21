@@ -13,6 +13,7 @@ export function ParkingManagement() {
   const { addToast } = useAppStore();
   
   const [editingSlot, setEditingSlot] = useState<ParkingSlot | null>(null);
+  const [label, setLabel] = useState('');
   const [status, setStatus] = useState('');
   const [managerId, setManagerId] = useState('');
   const [deletingSlotId, setDeletingSlotId] = useState<string | null>(null);
@@ -29,6 +30,7 @@ export function ParkingManagement() {
 
   const handleEdit = (slot: ParkingSlot) => {
     setEditingSlot(slot);
+    setLabel(slot.label);
     setStatus(slot.status);
     setManagerId(slot.reserved_for_manager_id || '');
   };
@@ -38,6 +40,10 @@ export function ParkingManagement() {
     if (!editingSlot) return;
 
     try {
+      if (label.trim() !== editingSlot.label) {
+        await api.slots.update(editingSlot.id, { label: label.trim() });
+      }
+
       if (status !== editingSlot.status) {
         await api.slots.setStatus(editingSlot.id, status);
       }
@@ -199,7 +205,7 @@ export function ParkingManagement() {
             <div key={slot.id} style={{ padding: '16px', border: '1px solid #E4E7EC', borderRadius: '12px', background: '#F9FAFB' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                 <div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#101828' }}>{slot.label}-{slot.position}</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#101828' }}>{slot.label}</div>
                   <div style={{ fontSize: '12px', color: '#667085', marginTop: '4px', textTransform: 'capitalize' }}>Status: {slot.status}</div>
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
@@ -226,8 +232,20 @@ export function ParkingManagement() {
       {editingSlot && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
           <div style={{ background: '#FFF', padding: '32px', borderRadius: '16px', width: '400px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '24px' }}>Edit Slot {editingSlot.label}-{editingSlot.position}</h3>
+            <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '24px' }}>Edit Slot {editingSlot.label}</h3>
             <form onSubmit={handleSave}>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>Slot Name / Label</label>
+                <input
+                  type="text"
+                  required
+                  value={label}
+                  onChange={e => setLabel(e.target.value.toUpperCase().trim())}
+                  placeholder="e.g. 106A"
+                  style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #D1D5DB', boxSizing: 'border-box' }}
+                />
+              </div>
+
               <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>Status</label>
                 <select value={status} onChange={e => setStatus(e.target.value)} style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #D1D5DB' }}>

@@ -193,7 +193,7 @@
   "slots": [
     {
       "id": "P101",
-      "label": "P101",
+      "label": "106A",
       "floor_id": "floor-b1",
       "position": 1,
       "status": "active",
@@ -201,7 +201,7 @@
     },
     {
       "id": "P102",
-      "label": "P102",
+      "label": "106A",
       "floor_id": "floor-b1",
       "position": 2,
       "status": "active",
@@ -209,7 +209,7 @@
     },
     {
       "id": "P103",
-      "label": "P103",
+      "label": "106A",
       "floor_id": "floor-b1",
       "position": 3,
       "status": "active",
@@ -217,7 +217,7 @@
     },
     {
       "id": "P104",
-      "label": "P104",
+      "label": "106A",
       "floor_id": "floor-b1",
       "position": 4,
       "status": "active",
@@ -225,7 +225,7 @@
     },
     {
       "id": "P105",
-      "label": "P105",
+      "label": "106A",
       "floor_id": "floor-b1",
       "position": 5,
       "status": "active",
@@ -233,7 +233,7 @@
     },
     {
       "id": "P106",
-      "label": "P106",
+      "label": "106A",
       "floor_id": "floor-b1",
       "position": 6,
       "status": "active",
@@ -241,7 +241,7 @@
     },
     {
       "id": "P107",
-      "label": "P107",
+      "label": "106A",
       "floor_id": "floor-b1",
       "position": 7,
       "status": "active",
@@ -249,7 +249,7 @@
     },
     {
       "id": "P108",
-      "label": "P108",
+      "label": "106A",
       "floor_id": "floor-b1",
       "position": 8,
       "status": "active",
@@ -257,7 +257,7 @@
     },
     {
       "id": "P201",
-      "label": "P201",
+      "label": "106A",
       "floor_id": "floor-b2",
       "position": 1,
       "status": "active",
@@ -265,7 +265,7 @@
     },
     {
       "id": "P202",
-      "label": "P202",
+      "label": "106A",
       "floor_id": "floor-b2",
       "position": 2,
       "status": "active",
@@ -273,7 +273,7 @@
     },
     {
       "id": "P203",
-      "label": "P203",
+      "label": "106A",
       "floor_id": "floor-b2",
       "position": 3,
       "status": "active",
@@ -281,7 +281,7 @@
     },
     {
       "id": "P204",
-      "label": "P204",
+      "label": "106A",
       "floor_id": "floor-b2",
       "position": 4,
       "status": "active",
@@ -289,7 +289,7 @@
     },
     {
       "id": "P205",
-      "label": "P205",
+      "label": "106A",
       "floor_id": "floor-b2",
       "position": 5,
       "status": "active",
@@ -297,7 +297,7 @@
     },
     {
       "id": "P206",
-      "label": "P206",
+      "label": "106A",
       "floor_id": "floor-b2",
       "position": 6,
       "status": "active",
@@ -305,7 +305,7 @@
     },
     {
       "id": "P207",
-      "label": "P207",
+      "label": "106A",
       "floor_id": "floor-b2",
       "position": 7,
       "status": "active",
@@ -313,7 +313,7 @@
     },
     {
       "id": "P208",
-      "label": "P208",
+      "label": "106A",
       "floor_id": "floor-b2",
       "position": 8,
       "status": "active",
@@ -321,7 +321,7 @@
     },
     {
       "id": "P301",
-      "label": "P301",
+      "label": "106A",
       "floor_id": "floor-b3",
       "position": 1,
       "status": "active",
@@ -329,7 +329,7 @@
     },
     {
       "id": "P302",
-      "label": "P302",
+      "label": "106A",
       "floor_id": "floor-b3",
       "position": 2,
       "status": "active",
@@ -337,7 +337,7 @@
     },
     {
       "id": "P303",
-      "label": "P303",
+      "label": "106A",
       "floor_id": "floor-b3",
       "position": 3,
       "status": "active",
@@ -345,7 +345,7 @@
     },
     {
       "id": "P304",
-      "label": "P304",
+      "label": "106A",
       "floor_id": "floor-b3",
       "position": 4,
       "status": "active",
@@ -353,7 +353,7 @@
     },
     {
       "id": "P305",
-      "label": "P305",
+      "label": "106A",
       "floor_id": "floor-b3",
       "position": 5,
       "status": "active",
@@ -361,7 +361,7 @@
     },
     {
       "id": "P306",
-      "label": "P306",
+      "label": "106A",
       "floor_id": "floor-b3",
       "position": 6,
       "status": "active",
@@ -369,7 +369,7 @@
     },
     {
       "id": "P307",
-      "label": "P307",
+      "label": "106A",
       "floor_id": "floor-b3",
       "position": 7,
       "status": "active",
@@ -377,7 +377,7 @@
     },
     {
       "id": "P308",
-      "label": "P308",
+      "label": "106A",
       "floor_id": "floor-b3",
       "position": 8,
       "status": "active",

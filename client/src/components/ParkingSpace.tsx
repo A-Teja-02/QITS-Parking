@@ -304,7 +304,7 @@ export function ParkingSpace({
           letterSpacing: '0.05em',
         }}
       >
-        {slot.label}-{slot.position}
+        {slot.label}
       </div>
 
       {(state === 'available' || state === 'released_manager') && isClickable && (
