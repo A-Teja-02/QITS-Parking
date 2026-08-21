@@ -3,21 +3,31 @@ import { motion } from 'framer-motion';
 import { History, Calendar, Car } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { api } from '../services/api';
-import type { Reservation } from '../types';
+import type { Reservation, ParkingSlot } from '../types';
 import { formatDisplayDate } from '../utils/date';
 
 export function ReservationHistory() {
   const { user } = useAuthStore();
   const [history, setHistory] = useState<Reservation[]>([]);
+  const [slotMap, setSlotMap] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
-      api.reservations.history(user.id)
-        .then(data => {
+      Promise.all([
+        api.reservations.history(user.id),
+        api.slots.list()
+      ])
+        .then(([historyData, slotsData]) => {
           // Sort descending by date
-          data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-          setHistory(data);
+          historyData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+          setHistory(historyData);
+
+          const mapping: Record<string, string> = {};
+          slotsData.forEach(slot => {
+            mapping[slot.id] = slot.label;
+          });
+          setSlotMap(mapping);
         })
         .finally(() => setLoading(false));
     }
@@ -66,7 +76,7 @@ export function ReservationHistory() {
                   </div>
                 </td>
                 <td style={{ padding: '16px', fontSize: '14px', color: '#101828', fontWeight: '500' }}>
-                  {res.slot_id}
+                  {slotMap[res.slot_id] || res.slot_id}
                 </td>
                 <td style={{ padding: '16px', fontSize: '14px', color: '#667085', fontFamily: 'monospace' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
