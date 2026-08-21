@@ -139,23 +139,37 @@ export function Navbar() {
             aria-haspopup="true"
           >
             {/* Avatar */}
-            <div
-              style={{
-                width: '30px',
-                height: '30px',
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #1E3A5F 0%, #4A6FA5 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '11px',
-                fontWeight: '600',
-                color: 'white',
-                flexShrink: 0,
-              }}
-            >
-              {user.avatar_initials}
-            </div>
+            {user.profile_picture_url ? (
+              <img
+                src={user.profile_picture_url}
+                alt={user.name}
+                style={{
+                  width: '30px',
+                  height: '30px',
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  flexShrink: 0,
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: '30px',
+                  height: '30px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #1E3A5F 0%, #4A6FA5 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '11px',
+                  fontWeight: '600',
+                  color: 'white',
+                  flexShrink: 0,
+                }}
+              >
+                {user.avatar_initials}
+              </div>
+            )}
             <span style={{ fontSize: '14px', fontWeight: '500', color: '#344054' }}>
               {user.name.split(' ')[0] || user.email.split('@')[0]}
             </span>
@@ -195,23 +209,37 @@ export function Navbar() {
               {/* User info header */}
               <div style={{ padding: '16px', borderBottom: '1px solid #F2F4F7' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div
-                    style={{
-                      width: '38px',
-                      height: '38px',
-                      borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #1E3A5F 0%, #4A6FA5 100%)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      color: 'white',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {user.avatar_initials}
-                  </div>
+                  {user.profile_picture_url ? (
+                    <img
+                      src={user.profile_picture_url}
+                      alt={user.name}
+                      style={{
+                        width: '38px',
+                        height: '38px',
+                        borderRadius: '50%',
+                        objectFit: 'cover',
+                        flexShrink: 0,
+                      }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        width: '38px',
+                        height: '38px',
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #1E3A5F 0%, #4A6FA5 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        color: 'white',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {user.avatar_initials}
+                    </div>
+                  )}
                   <div>
                     <p
                       style={{

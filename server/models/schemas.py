@@ -63,6 +63,7 @@ class User(BaseModel):
     role: str
     is_active: bool
     account_status: str = "inactive"
+    profile_picture_url: Optional[str] = None
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
 

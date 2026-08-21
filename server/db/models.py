@@ -38,6 +38,7 @@ class Employee(Base):
     vehicle_number = Column(String(50), nullable=False, default="")
     mobile_number = Column(String(20), nullable=False, default="")
     avatar_initials = Column(String(5), nullable=False, default="")
+    profile_picture_url = Column(String(500), nullable=True)
     account_status = Column(String(20), nullable=False, default="inactive")  # inactive, active
     is_active = Column(Boolean, nullable=False, default=True)  # HR can deactivate
     created_at = Column(DateTime, default=utcnow, nullable=False)

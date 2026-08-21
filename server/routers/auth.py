@@ -1,7 +1,8 @@
 """
 Authentication router — handles login, activation, password reset, password change.
 """
-from fastapi import APIRouter, HTTPException, Header, Depends
+import os
+from fastapi import APIRouter, HTTPException, Header, Depends, UploadFile, File
 from typing import Optional
 from sqlalchemy.orm import Session
 
@@ -198,3 +199,42 @@ def update_profile(
     if not updated:
         raise HTTPException(status_code=404, detail="User not found")
     return updated
+
+
+@router.post("/profile/picture", response_model=User)
+def upload_profile_picture(
+    file: UploadFile = File(...),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Upload a profile picture for the currently logged-in user."""
+    import shutil
+    
+    # Validate file type
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File must be an image.")
+        
+    # Get file extension
+    file_ext = os.path.splitext(file.filename)[1]
+    if file_ext.lower() not in [".jpg", ".jpeg", ".png", ".webp", ".gif"]:
+        raise HTTPException(status_code=400, detail="Invalid image format.")
+        
+    # Save directory
+    os.makedirs("uploads", exist_ok=True)
+    filename = f"{user.id}{file_ext}"
+    filepath = os.path.join("uploads", filename)
+    
+    # Write to local disk
+    with open(filepath, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+        
+    # Public URL
+    profile_pic_url = f"/uploads/{filename}"
+    
+    from services import user_service
+    updated = user_service.update_user(db, user.id, {"profile_picture_url": profile_pic_url})
+    if not updated:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    return updated
+

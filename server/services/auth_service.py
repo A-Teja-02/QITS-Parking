@@ -46,10 +46,12 @@ def _employee_to_user(emp: Employee) -> User:
         email=emp.email,
         department=emp.department,
         vehicle_number=emp.vehicle_number,
+        mobile_number=emp.mobile_number,
         avatar_initials=emp.avatar_initials,
         role=emp.role,
         is_active=emp.is_active,
         account_status=emp.account_status,
+        profile_picture_url=emp.profile_picture_url,
         created_at=emp.created_at.isoformat() if emp.created_at else None,
         updated_at=emp.updated_at.isoformat() if emp.updated_at else None,
     )

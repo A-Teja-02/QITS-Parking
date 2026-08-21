@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useAppStore } from '../store/useAppStore';
 import { api } from '../services/api';
-import { ArrowLeft, User as UserIcon, Building2, Car, Mail, CheckCircle2, Phone } from 'lucide-react';
+import { ArrowLeft, User as UserIcon, Building2, Car, Mail, CheckCircle2, Phone, Camera } from 'lucide-react';
 
 export function ProfilePage() {
   const { user, setUser } = useAuthStore();
@@ -15,6 +15,28 @@ export function ProfilePage() {
   const [vehicleNumber, setVehicleNumber] = useState(user.vehicle_number || '');
   const [mobileNumber, setMobileNumber] = useState(user.mobile_number || '');
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      addToast({ type: 'error', message: 'Image size should be less than 5MB.' });
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const updatedUser = await api.auth.uploadProfilePicture(file);
+      setUser(updatedUser);
+      addToast({ type: 'success', message: 'Profile picture updated successfully!' });
+    } catch (err: any) {
+      addToast({ type: 'error', message: err.message || 'Failed to upload profile picture.' });
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -133,11 +155,50 @@ export function ProfilePage() {
                 background: '#EEF2FF',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                position: 'relative',
+                cursor: isUploading ? 'not-allowed' : 'pointer',
               }}
+              onClick={() => !isUploading && document.getElementById('avatar-input')?.click()}
             >
-              {user.avatar_initials}
+              {user.profile_picture_url ? (
+                <img
+                  src={user.profile_picture_url}
+                  alt={user.name}
+                  style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+                />
+              ) : (
+                user.avatar_initials
+              )}
+              
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  right: 0,
+                  background: '#1E3A5F',
+                  borderRadius: '50%',
+                  width: '28px',
+                  height: '28px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+                  border: '2px solid #FFFFFF',
+                  opacity: isUploading ? 0.6 : 1,
+                }}
+              >
+                <Camera size={14} color="#FFFFFF" />
+              </div>
             </div>
+            <input
+              id="avatar-input"
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleAvatarUpload}
+              disabled={isUploading}
+            />
           </div>
 
           <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>

@@ -85,6 +85,32 @@ export const api = {
         method: 'PUT',
         body: JSON.stringify(data),
       }),
+    uploadProfilePicture: (file: File) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const token = getToken();
+      const headers: HeadersInit = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      return fetch(`${BASE_URL}/auth/profile/picture`, {
+        method: 'POST',
+        headers,
+        body: formData
+      }).then(async (res) => {
+        if (!res.ok) {
+          let message = `HTTP ${res.status}`;
+          try {
+            const body = await res.json();
+            message = body.detail || body.message || message;
+          } catch {}
+          throw new Error(message);
+        }
+        return res.json() as Promise<User>;
+      });
+    },
   },
   
   // ─── Parking APIs (UNTOUCHED) ─────────────────────────────────────────────

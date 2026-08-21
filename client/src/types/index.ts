@@ -11,6 +11,7 @@ export interface User {
   avatar_initials: string;
   role: UserRole;
   is_active: boolean;
+  profile_picture_url?: string;
 }
 
 export interface Floor {

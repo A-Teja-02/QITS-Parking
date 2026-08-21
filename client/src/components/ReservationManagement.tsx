@@ -189,9 +189,22 @@ export function ReservationManagement() {
                   <tr key={res.id} style={{ borderBottom: '1px solid #F1F5F9', transition: 'background 150ms' }} onMouseEnter={(e) => e.currentTarget.style.background = '#F8FAFC'} onMouseLeave={(e) => e.currentTarget.style.background = 'none'}>
                     <td style={{ padding: '16px 24px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#EEF2FF', color: '#1E3A5F', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600', fontSize: '12px' }}>
-                          <span style={{ margin: 'auto' }}>{user?.avatar_initials || res.user_name.substring(0, 2).toUpperCase()}</span>
-                        </div>
+                        {user?.profile_picture_url ? (
+                          <img
+                            src={user.profile_picture_url}
+                            alt={res.user_name}
+                            style={{
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '50%',
+                              objectFit: 'cover'
+                            }}
+                          />
+                        ) : (
+                          <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#EEF2FF', color: '#1E3A5F', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600', fontSize: '12px' }}>
+                            <span style={{ margin: 'auto' }}>{user?.avatar_initials || res.user_name.substring(0, 2).toUpperCase()}</span>
+                          </div>
+                        )}
                         <div>
                           <div style={{ fontSize: '14px', fontWeight: '600', color: '#1E293B' }}>{res.user_name}</div>
                           <div style={{ fontSize: '12px', color: '#64748B' }}>{user?.email || ''}</div>

@@ -116,9 +116,22 @@ export function EmployeeManagement() {
               <tr key={u.id} style={{ borderBottom: '1px solid #F3F4F6' }}>
                 <td style={{ padding: '16px 24px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#1E3A5F', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: '600' }}>
-                      {u.avatar_initials}
-                    </div>
+                    {u.profile_picture_url ? (
+                      <img
+                        src={u.profile_picture_url}
+                        alt={u.name}
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          objectFit: 'cover'
+                        }}
+                      />
+                    ) : (
+                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#1E3A5F', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: '600' }}>
+                        {u.avatar_initials}
+                      </div>
+                    )}
                     <div>
                       <div style={{ fontSize: '14px', fontWeight: '500', color: '#101828' }}>{u.name}</div>
                       <div style={{ fontSize: '13px', color: '#667085' }}>{u.email}</div>
